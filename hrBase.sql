@@ -1,0 +1,15 @@
+alter table countries rename to country_new;
+alter table locations add column region_id char(3) not null default '';
+alter table locations modify country_id char(2) not null default '';
+alter table locations drop column city;
+alter table locations change state_province state varchar(25);
+alter table locations add primary key(LOCATION_ID);
+alter table locations drop primary key;
+alter table locations add primary key(location_id);
+alter table locations add primary key(location_id, country_id);
+alter table job_history engine InnoDB;
+show create table job_history;
+alter table jobs engine InnoDB;
+alter table job_history add foreign key(job_id) references jobs(job_id);
+alter table jobs drop primary key;
+alter table jobs add primary key(job_id);

@@ -24,7 +24,8 @@ begin
     
     declare c_bookings cursor for select *
 								from BOOKING
-								where date(ENDDATE) < now();
+								where date(ENDDATE) < now()
+                                limit 50;
                                 
 	declare continue handler for not found set v_fin = 1;
     
@@ -42,7 +43,7 @@ begin
 		
 		insert into BOOKING_OLD(ID, ENDDATE, PRICE) values(v_bookingId, v_bookingDate, v_bookingPrice);
         delete from BOOKING where ID = v_bookingId;
-	
+        
 	
     end loop l_bookings;
     

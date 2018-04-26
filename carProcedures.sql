@@ -233,61 +233,71 @@ drop procedure load_gas;
 
 call load_gas;
 
-delimiter $$
-create procedure change_values()
+DELIMITER $$
+CREATE DEFINER=`alumne`@`localhost` PROCEDURE `load_engine`()
 begin
+	declare v_aspiration int;
+    declare v_engineType int;
+    declare v_fuelSystem int;
+    declare v_fuelType int;
+    declare v_numCylinders varchar(16);
+    declare v_engineSize double;
+    declare v_compressionRatio double;
+    declare v_bore double;
+    declare v_stroke double;
+    declare v_peakRPM int;
+    declare v_horsePower int;
 	declare v_fin int;
-    declare v_dolar int;
-    declare v_fiabilidad int;
-    declare v_mpg int;
-    declare v_numDoor varchar(10);
-    declare v_cylinder varchar(10);
-    declare v_length
-
-delimiter $$
-create procedure load_bodyWork()
-begin
-	declare v_bodyStyle int;
-    declare v_length double;
-    declare v_width double;
-    declare v_height double;
-    declare v_wheelBase double;
-    declare v_numDoors varchar(10);
-    declare v_fin int;
     
-    declare c_bodyWork cursor for 
-								select BODY_STYLE.id, length, width, height, wheelBase, numDoors
-                                from carsTMP, BODY_STYLE
-                                where carsTMP.bodyStyle = BODY_STYLE.bodyStyle;
+    declare c_engine cursor for 
+							select distinct 
+								ASPIRATION.id, ENGINE_TYPE.id, FUEL_SYSTEM.id, GAS.id, numCylinders, 
+                                engineSize, bore, stroke, compressionRatio, horsePower, peakRpm
+							from
+								ASPIRATION,
+								ENGINE_TYPE,
+								FUEL_SYSTEM,
+                                GAS,
+								carsTMP
+							where
+								ASPIRATION.aspiration = carsTMP.aspiration and
+								ENGINE_TYPE.engineType = carsTMP.engineType and
+                                GAS.fuelType = carsTMP.fuelType and
+								FUEL_SYSTEM.fuelSystem = carsTMP.fuelSystem;
                                 
-	declare continue handler for not found set v_fin = 1;	
+	declare continue handler for not found set v_fin = 1;
     
-    set v_fin = 0;
+	set v_fin = 0;								
+    open c_engine;
     
-    open c_bodyWork;
-    
-    l_bodyWork : loop
-    
-		fetch c_bodyWork into v_bodyStyle, v_length, v_width, v_height, v_wheelBase, v_numDoors;
- 
+    l_engine : loop
+		fetch c_engine into v_aspiration, v_engineType, 
+							v_fuelSystem, v_fuelType, v_numCylinders, 
+                            v_engineSize, v_bore, v_stroke, 
+                            v_compressionRatio, v_horsePower,
+                            v_peakRPM;
+		
         if v_fin = 1 then
-			leave l_bodyWork;
-		end if;
-        
-        insert into BODY_WORK(bodyStyle, length, width, height, wheelBase, numDoors) values(v_bodyStyle, inchesToCm(v_length), inchesToCm(v_width), inchesToCm(v_height), inchesToCm(v_wheelBase), numDoorsCylinders(v_numDoors));
-
-        
-	end loop l_bodyWork;
+			leave l_engine;
+		end if;		
     
-    close c_bodyWork;
-    
-end;
-$$
-delimiter ;		
+		insert into ENGINE(aspiration, engineType, fuelSystem, fuelType, numCylinders,
+							engineSize, bore, stroke, compressionRatio, horsePower, peakRpm)
+		values(v_aspiration, v_engineType, v_fuelSystem, v_fuelType, numDoorsCylinders(v_numCylinders),
+				cubicInchToCm(v_engineSize), inchesToCm(v_bore), inchesToCm(v_stroke),
+                v_compressionRatio, v_horsePower, v_peakRPM);
+                
+		end loop l_engine;
+        
+        close c_engine;
+end$$
+DELIMITER ;
 
-drop procedure load_bodyWork;
 
-call load_bodyWork;
+
+drop procedure load_engine;
+
+call load_engine;
 		
 		
 		

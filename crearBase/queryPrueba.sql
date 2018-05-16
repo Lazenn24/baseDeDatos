@@ -65,6 +65,6 @@ where
     ENGINE.fuelType = FUEL_TYPE.id and
     ENGINE.aspiration = ASPIRATION.id and
     ENGINE.engineType = ENGINE_TYPE.id and
-    highwayConsume > 12;
+    highwayConsume > 13;
     
     
